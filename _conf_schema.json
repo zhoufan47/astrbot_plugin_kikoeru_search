@@ -1,0 +1,27 @@
+{
+    "api_url": {
+        "description": "本地kikoeru地址",
+        "type": "string",
+        "default": "http://192.168.31.1:5233"
+    },
+    "api_key": {
+        "description": "本地kikoeru Cookies",
+        "type": "string",
+        "default": "123123123"
+    },
+    "external_url": {
+        "description": "kikoeru 外网访问地址",
+        "type": "string",
+        "default": "https://kikoeru.com:5233"
+    },
+    "remote_key": {
+        "description": "ASMR.ONE cookie",
+        "type": "string",
+        "default": "123123123"
+    },
+    "check_local_flag": {
+        "description": "查询远程ASMR库是是否检查本地库是否存在该作品",
+        "type": "boolean",
+        "default": false
+    }
+}
