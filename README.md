@@ -1,0 +1,2 @@
+# astrbot_plugin_kikoeru_search
+查询kikoeru数据
