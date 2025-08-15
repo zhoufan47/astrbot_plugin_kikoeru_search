@@ -119,8 +119,11 @@ class MyPlugin(Star):
         try:
             yield event.plain_result(f"开始查询远端资源库 {query_str} 的信息……")
             response = await self.query_remote_repository("check", query_str)
-            pid = "RJ" + str(response.get("id"))  # 作品ID
             name = response.get("title")  # 作品名称
+            if name == 'donotexits':
+                yield event.plain_result(f"远端资源库不存在作品{query_str}，请确认番号是否正确")
+                return
+            pid = "RJ" + str(response.get("id"))  # 作品ID
             price = response.get("price", 0)  # 售价
             sales = response.get("dl_count", 0)  # 销量
             nsfw = response.get("nsfw", False)  # 年龄分级
@@ -218,7 +221,7 @@ class MyPlugin(Star):
             response.raise_for_status()
             logger.info(f"HTTP STATUS: {response.status}")
             if response.status == 404:
-                return {id:"donotexits"}
+                return {"title":"donotexits"}
             return await response.json()
 
     async def query_remote_repository(self,trade_type:str,params:str) -> dict:
@@ -243,6 +246,8 @@ class MyPlugin(Star):
         async with self.http_session_proxy.get(url, params=params,headers=headers) as response:
             response.raise_for_status()
             logger.info(f"远端资源库返回HTTP STATUS: {response.status}")
+            if response.status == 404:
+                return {id:"donotexits"}
             return await response.json()
 
     async def terminate(self):
