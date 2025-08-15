@@ -21,8 +21,8 @@ class MyPlugin(Star):
         super().__init__(context)
         #用来访问本地库的http_session
         self.http_session_local = aiohttp.ClientSession(trust_env=False)
-        #用来访问ASMR.ONE的http_session
-        self.http_session_proxy = aiohttp.ClientSession(trust_env=True,timeout=aiohttp.ClientTimeout(total=10))
+        #用来访问ASMR.ONE的http_session,使用astrbot提供的代理信息
+        self.http_session_proxy = aiohttp.ClientSession(trust_env=True)
         self.config = config
         #本地库地址
         self.api_url = config.get('api_url')
