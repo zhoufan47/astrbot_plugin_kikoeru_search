@@ -61,7 +61,7 @@ class MyPlugin(Star):
             rating = response.get("rating",0)       #评分
             rating_count = response.get("rating_count", 0) #评价人数
             release_date = response.get("release_date", "未知")
-            makers = response.get("maker").get("name")
+            makers = response.get("maker",{}).get("name")
 
             # 表演者
             artists_source = response.get("artists", [])
