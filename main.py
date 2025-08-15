@@ -47,12 +47,12 @@ class MyPlugin(Star):
         logger.info(f"查询条件{query_str}")
         try:
             response = await self.query_local_repository("check", query_str)
-            pid = response.get("id")                #作品ID
+            pid = response.get("id",self.ITEM_NOT_FOUND)                #作品ID
             if pid == self.ITEM_NOT_FOUND:
                 yield event.plain_result(f"本地资源库不存在作品{query_str},可以下载！")
                 return
 
-            name = response.get("name")             #作品名称
+            name = response.get("name","不存在")             #作品名称
             price = response.get("price",0)          #售价
             sales = response.get("sales", 0)                #销量
             age_category = response.get("age_category",0) #年龄分级
@@ -64,31 +64,16 @@ class MyPlugin(Star):
             makers = response.get("maker").get("name")
 
             # 表演者
-            artists_list = []
-            artists_source = response.get("artists")
-            # 使用 for 循环遍历这个列表
-            for artist_dict in artists_source:
-                # 在每次循环中，从当前的字典中提取 "name" 键的值
-                artists_list.append(artist_dict["name"])
-            artists = ",".join(artists_list)
+            artists_source = response.get("artists", [])
+            artists = ",".join([artist.get("name", "") for artist in artists_source])
 
             #插画师
-            illustrators_list = []
-            illustrators_source = response.get("illustrators")
-            # 使用 for 循环遍历这个列表
-            for illustrators_dict in illustrators_source:
-                # 在每次循环中，从当前的字典中提取 "name" 键的值
-                illustrators_list.append(illustrators_dict["name"])
-            illustrators = ",".join(illustrators_list)
-
+            illustrators_source = response.get("illustrators",[])
+            illustrators = ",".join([illustrator.get("name", "") for illustrator in illustrators_source])
             #tags
-            genres_list = []
-            genres_source = response.get("genres")
-            # 使用 for 循环遍历这个列表
-            for genres_dict in genres_source:
-                # 在每次循环中，从当前的字典中提取 "name" 键的值
-                genres_list.append(genres_dict["name"])
-            genres = ",".join(genres_list)
+            genres_source = response.get("genres",[])
+            genres = ",".join([genre.get("name", "") for genre in genres_source])
+
             reply_message = (
                 f"✅ 查询成功！\n"
                 f"--------------------\n"
@@ -121,11 +106,11 @@ class MyPlugin(Star):
         try:
             yield event.plain_result(f"开始查询远端资源库 {query_str} 的信息……")
             response = await self.query_remote_repository("check", query_str)
-            name = response.get("title")  # 作品名称
+            name = response.get("title",self.ITEM_NOT_FOUND)  # 作品名称
             if name == self.ITEM_NOT_FOUND:
                 yield event.plain_result(f"远端资源库不存在作品{query_str}，请确认番号是否正确")
                 return
-            pid = "RJ" + str(response.get("id"))  # 作品ID
+            pid = "RJ" + str(response.get("id",0))  # 作品ID
             price = response.get("price", 0)  # 售价
             sales = response.get("dl_count", 0)  # 销量
             nsfw = response.get("nsfw", False)  # 年龄分级
@@ -139,22 +124,15 @@ class MyPlugin(Star):
             makers = response.get("name", "未知")
 
             # 表演者
-            artists_list = []
-            for item in response.get("vas",[]):
-                artists_list.append(item["name"])
-            artists = ",".join(artists_list)
-
+            artists_source = response.get("vas", [])
+            artists = ",".join([artist.get("name", "") for artist in artists_source])
             # 插画师
-            illustrators_list = []
-            for item in response.get("illustrators",[]):
-                illustrators_list.append(item["name"])
-            illustrators = ",".join(illustrators_list)
+            illustrators_source = response.get("illustrators", [])
+            illustrators = ",".join([illustrator.get("name", "") for illustrator in illustrators_source])
 
             # tags
-            genres_list = []
-            for item in response.get("tags",[]):
-                genres_list.append(item["name"])
-            genres = ",".join(genres_list)
+            genres_source = response.get("tags",[])
+            genres = ",".join([genre.get("name", "") for genre in genres_source])
             reply_message = (
                 f"✅ 查询成功！\n"
                 f"--------------------\n"
