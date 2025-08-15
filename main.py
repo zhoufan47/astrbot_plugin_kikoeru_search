@@ -221,7 +221,7 @@ class MyPlugin(Star):
             response.raise_for_status()
             logger.info(f"HTTP STATUS: {response.status}")
             if response.status == 404:
-                return {"title":"donotexits"}
+                return {"id":"donotexits"}
             return await response.json()
 
     async def query_remote_repository(self,trade_type:str,params:str) -> dict:
@@ -247,7 +247,7 @@ class MyPlugin(Star):
             response.raise_for_status()
             logger.info(f"远端资源库返回HTTP STATUS: {response.status}")
             if response.status == 404:
-                return {id:"donotexits"}
+                return {title:"donotexits"}
             return await response.json()
 
     async def terminate(self):
