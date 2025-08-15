@@ -17,6 +17,8 @@ class MyPlugin(Star):
         2: "R-15",
         3: "R-18"
     }
+    ITEM_NOT_FOUND = "item_not_found"
+
     def __init__(self, context: Context,config: dict):
         super().__init__(context)
         #用来访问本地库的http_session
@@ -46,7 +48,7 @@ class MyPlugin(Star):
         try:
             response = await self.query_local_repository("check", query_str)
             pid = response.get("id")                #作品ID
-            if pid == 'donotexits':
+            if pid == self.ITEM_NOT_FOUND:
                 yield event.plain_result(f"本地资源库不存在作品{query_str},可以下载！")
                 return
 
@@ -120,7 +122,7 @@ class MyPlugin(Star):
             yield event.plain_result(f"开始查询远端资源库 {query_str} 的信息……")
             response = await self.query_remote_repository("check", query_str)
             name = response.get("title")  # 作品名称
-            if name == 'donotexits':
+            if name == self.ITEM_NOT_FOUND:
                 yield event.plain_result(f"远端资源库不存在作品{query_str}，请确认番号是否正确")
                 return
             pid = "RJ" + str(response.get("id"))  # 作品ID
@@ -221,7 +223,7 @@ class MyPlugin(Star):
             response.raise_for_status()
             logger.info(f"HTTP STATUS: {response.status}")
             if response.status == 404:
-                return {"id":"donotexits"}
+                return {"id":self.ITEM_NOT_FOUND}
             return await response.json()
 
     async def query_remote_repository(self,trade_type:str,params:str) -> dict:
@@ -247,7 +249,7 @@ class MyPlugin(Star):
             response.raise_for_status()
             logger.info(f"远端资源库返回HTTP STATUS: {response.status}")
             if response.status == 404:
-                return {title:"donotexits"}
+                return {"title":self.ITEM_NOT_FOUND}
             return await response.json()
 
     async def terminate(self):
