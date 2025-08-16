@@ -98,6 +98,7 @@ class MyPlugin(Star):
             f"😃 评分人数:{data.get("rating_count")}\n"
             f"⛔ 年龄分级:{data.get("rate_grade")}\n"
             f"--------------------\n"
+            f"https://asmr.one/work/{data.get("pid")}"
         )
         return reply_message
 
