@@ -60,6 +60,7 @@ class MyPlugin(Star):
             logger.error(f"插件 [kikoeru_search] 处理命令 时发生未知错误: {e}", exc_info=True)
             yield event.plain_result("插件处理时发生未知错误，请联系管理员查看后台日志。")
 
+    #创建本地库消息
     def create_local_check_message(self, data:dict):
         reply_message = (
             f"✅ 查询成功！\n"
@@ -81,6 +82,7 @@ class MyPlugin(Star):
         )
         return reply_message
 
+    #创建远端库消息
     def create_remote_check_message(self, data:dict):
         reply_message = (
             f"✅ 查询成功！\n"
@@ -135,6 +137,7 @@ class MyPlugin(Star):
                     Image.fromBytes(img_data)
                 ]
                 yield event.chain_result(chain)
+
             if self.check_local_flag:
                 response = await self.query_local_repository("check", query_str)
                 data = self.parse_local_result(response)
