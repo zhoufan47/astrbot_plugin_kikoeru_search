@@ -35,7 +35,7 @@
         "default": "123123123"
     },
     "check_local_flag": {
-        "description": "查询远程ASMR库是是否检查本地库是否存在该作品",
+        "description": "查询远程ASMR库时是否检查本地库是否存在该作品",
         "type": "bool",
         "default": false
     }
