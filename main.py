@@ -12,18 +12,18 @@ def create_check_message(data:dict, base_url:str) -> str:
     reply_message = (
         f"✅ 查询成功！\n"
         f"--------------------\n"
-        f"🎬 标题:{data.get("title")}\n"
-        f"🔢 番号:{data.get("pid")}\n"
-        f"📅 发行日:{data.get("release_date")}\n"
-        f"🏢 制作组:{data.get("makers")}\n"
-        f"🎤 演员:{data.get("artist")}\n"
-        f"🎨 插画师:{data.get("illustrators")}\n"
-        f"🏷️ 标签:{data.get("tags")}\n"
-        f"💸 售价:{data.get("price")}\n"
-        f"🏬 销量:{data.get("sales")}\n"
-        f"🌟 评分:{data.get("rating")}/5\n"
-        f"😃 评分人数:{data.get("rating_count")}\n"
-        f"⛔ 年龄分级:{data.get("rate_grade")}\n"
+        f"🎬 标题:{data.get('title')}\n"
+        f"🔢 番号:{data.get('pid')}\n"
+        f"📅 发行日:{data.get('release_date')}\n"
+        f"🏢 制作组:{data.get('makers')}\n"
+        f"🎤 演员:{data.get('artists')}\n"
+        f"🎨 插画师:{data.get('illustrators')}\n"
+        f"🏷️ 标签:{data.get('tags')}\n"
+        f"💸 售价:{data.get('price')}\n"
+        f"🏬 销量:{data.get('sales')}\n"
+        f"🌟 评分:{data.get('rating')}/5\n"
+        f"😃 评分人数:{data.get('rating_count')}\n"
+        f"⛔ 年龄分级:{data.get('rate_grade')}\n"
         f"--------------------\n"
         f"{base_url}/work/{data.get('pid')}"
     )
@@ -127,7 +127,8 @@ class MyPlugin(Star):
                 if name == self.ITEM_NOT_FOUND:
                     yield event.plain_result(f"本地资源库不存在作品{query_str},可以下载！")
                 else:
-                    yield event.plain_result(f"本地资源库已存在作品{query_str}")
+                    yield event.plain_result(f"本地资源库已存在作品{query_str}\n"
+                                             f" {self.external_url}/work/{query_str}")
         except aiohttp.ClientResponseError as e:
             logger.error(f"插件 [kikoeru_search] 请求API时服务器返回错误: {e.status} {e.message}")
             yield event.plain_result(f"请求失败，服务器返回错误码：{e.status}")
