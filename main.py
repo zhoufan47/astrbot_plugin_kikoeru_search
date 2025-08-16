@@ -168,16 +168,20 @@ class MyPlugin(Star):
         }
         request_params = params if trade_type == 'search' else None
         base_url = self.api_url.rstrip('/')
+        if self.neokikoeru_flag:
+            base_url= base_url + "/api/v1"
+        else:
+            base_url = base_url + "/api"
         if trade_type == 'search':
             # 搜索场景
-            url = f"{base_url}/api/v1/works"
+            url = f"{base_url}/works"
             logger.info(f"搜索场景，条件 {params}")
         elif trade_type == 'check':
             #检查场景
-            url = f"{base_url}/api/v1/work/{params}"
+            url = f"{base_url}/work/{params}"
             logger.info(f"检测场景，条件 {params}")
         else:
-            url = f"{base_url}/api/v1/work/{params}"
+            url = f"{base_url}/work/{params}"
             logger.info(f"未知场景，默认为检查场景，条件 {params}")
 
         async with self.http_session_local.get(url, params=request_params,headers=headers) as response:

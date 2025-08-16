@@ -31,7 +31,7 @@ def parse_result(response)-> Dict[str, Any]:
     genres_source = response.get("genres", [])
     genres = ",".join([genre.get("name", "") for genre in genres_source])
     main_cover_url = response.get("image_main")
-    result_dic = {
+    result_dict = {
         "title": name,
         "pid": pid,
         "price": price,
@@ -46,4 +46,4 @@ def parse_result(response)-> Dict[str, Any]:
         "main_cover_url": main_cover_url,
         "makers":makers
     }
-    return result_dic
+    return result_dict
