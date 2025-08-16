@@ -9,6 +9,11 @@
         "type": "string",
         "default": "123123123"
     },
+    "neokikoeru_flag": {
+        "description": "本地库是否NEOKIKOERU",
+        "type": "bool",
+        "default": false
+    },
     "external_url": {
         "description": "kikoeru 外网访问地址",
         "type": "string",
