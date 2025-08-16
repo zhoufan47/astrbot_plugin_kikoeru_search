@@ -93,7 +93,7 @@ class MyPlugin(Star):
                 f"😃 评分人数:{rating_count}\n"
                 f"⛔ 年龄分级:{grade_cn}\n"
                 f"--------------------\n"
-                f"f{self.external_url}/work/{pid}"
+                f"{self.external_url}/work/{pid}"
             )
             yield event.plain_result(reply_message)
         except aiohttp.ClientResponseError as e:
@@ -124,8 +124,9 @@ class MyPlugin(Star):
             rating_count = response.get("rating_count", 0)  # 评价人数
             release_date = response.get("release", "未知")
             # 制作团队
-            makers = response.get("name", "未知")
-
+            makers = response.get("name", None)
+            if makers is None:
+                makers = response.get("circle", {}).get("name", "未知")
             # 表演者
             artists_source = response.get("vas", [])
             artists = ",".join([artist.get("name", "") for artist in artists_source])
@@ -220,7 +221,7 @@ class MyPlugin(Star):
             "Sec-Ch-Ua-Platform":"\"Windows\"",
             "user-agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 Edg/139.0.0.0"
         }
-        base_url = "https://api.asmr-200.com"
+        base_url = self.remote_api_url.rstrip('/')
         request_params = params if trade_type == 'search' else None
         if trade_type == 'search':
             # 搜索场景
