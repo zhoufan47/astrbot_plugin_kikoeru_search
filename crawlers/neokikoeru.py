@@ -7,10 +7,12 @@ RATE_GRADE = {
     2: "R-15",
     3: "R-18"
 }
+ITEM_NOT_FOUND = "不存在"
+
 
 def parse_result(response)-> Dict[str, Any]:
-    pid = response.get("id", "不存在")  # 作品ID
-    name = response.get("name", "不存在")  # 作品名称
+    pid = response.get("id", ITEM_NOT_FOUND)  # 作品ID
+    name = response.get("name", ITEM_NOT_FOUND)  # 作品名称
     price = response.get("price", 0)  # 售价
     sales = response.get("sales", 0)  # 销量
     age_category = response.get("age_category", 0)  # 年龄分级
