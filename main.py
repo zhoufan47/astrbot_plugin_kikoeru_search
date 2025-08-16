@@ -28,12 +28,15 @@ class MyPlugin(Star):
         self.api_url = config.get('api_url')
         #本地库cookies
         self.api_key = config.get('api_key')
+        if not self.api_url or not self.api_key:
+            logger.error("插件 [kikoeru_search] 的必要配置项 'api_url' 或 'api_key' 未填写，插件可能无法正常工作。")
         #asmr.one 的 cookies
-        self.remote_key = config.get('remote_key')
+        self.remote_key = config.get('remote_key',"")
         #本地库的外部网络访问地址
-        self.external_url = config.get('external_url')
+        self.external_url = config.get('external_url',self.api_url)
         #查询远程ASMR库是是否检查本地库是否存在该作品
-        self.check_local_flag = config.get('check_local_flag')
+        self.check_local_flag = config.get('check_local_flag',False)
+        self.remote_api_url = config.get('remote_api_url', 'https://api.asmr-200.com')
         logger.info("插件 [kikoeru_search] 已初始化。")
 
     async def initialize(self):
@@ -90,6 +93,7 @@ class MyPlugin(Star):
                 f"😃 评分人数:{rating_count}\n"
                 f"⛔ 年龄分级:{grade_cn}\n"
                 f"--------------------\n"
+                f"f{self.external_url}/work/{pid}"
             )
             yield event.plain_result(reply_message)
         except aiohttp.ClientResponseError as e:
@@ -150,20 +154,21 @@ class MyPlugin(Star):
                 f"--------------------\n"
             )
             yield event.plain_result(reply_message)
-            logger.info("检测到封面，地址" + main_cover_url)
-            headers = {
-                "authorization": f"Bearer {self.remote_key}",
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-                "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8"
-            }
+            if main_cover_url:
+                logger.info("检测到封面，地址" + main_cover_url)
+                headers = {
+                    "authorization": f"Bearer {self.remote_key}",
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                    "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8"
+                }
 
-            img_response = await self.http_session_proxy.get(main_cover_url, headers=headers)
-            img_response.raise_for_status()
-            img_data = await img_response.read()
-            chain = [
-                Image.fromBytes(img_data)
-            ]
-            yield event.chain_result(chain)
+                img_response = await self.http_session_proxy.get(main_cover_url, headers=headers)
+                img_response.raise_for_status()
+                img_data = await img_response.read()
+                chain = [
+                    Image.fromBytes(img_data)
+                ]
+                yield event.chain_result(chain)
             if self.check_local_flag:
                 rsp = await self.query_local_repository("check", query_str)
                 rst = rsp.get("id",self.ITEM_NOT_FOUND)
@@ -185,16 +190,17 @@ class MyPlugin(Star):
             "authorization":f"Bearer {self.api_key}",
         }
         request_params = params if trade_type == 'search' else None
+        base_url = self.api_url.rstrip('/')
         if trade_type == 'search':
             # 搜索场景
-            url = self.api_url + "/api/v1/works"
+            url = f"{base_url}/api/v1/works"
             logger.info(f"搜索场景，条件 {params}")
         elif trade_type == 'check':
             #检查场景
-            url = self.api_url + "/api/v1/work/" + params
+            url = f"{base_url}/api/v1/work/{params}"
             logger.info(f"检测场景，条件 {params}")
         else:
-            url = self.api_url + "/api/v1/works" + params
+            url = f"{base_url}/api/v1/work/{params}"
             logger.info(f"未知场景，条件 {params}")
 
         async with self.http_session_local.get(url, params=request_params,headers=headers) as response:
@@ -218,12 +224,12 @@ class MyPlugin(Star):
         request_params = params if trade_type == 'search' else None
         if trade_type == 'search':
             # 搜索场景
-            url = base_url + "/api/works"
+            url = f"{base_url}/api/works"
         elif trade_type == 'check':
             #检查场景
-            url = base_url + "/api/workInfo/" + params
+            url = f"{base_url}/api/workInfo/{params}"
         else:
-            url = base_url + "/api/workInfo/" + params
+            url = f"{base_url}/api/workInfo/{params}"
         async with self.http_session_proxy.get(url, params=request_params,headers=headers) as response:
             logger.info(f"远端资源库返回HTTP STATUS: {response.status}")
             if response.status == 404:

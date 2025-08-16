@@ -14,6 +14,11 @@
         "type": "string",
         "default": "https://kikoeru.com:5233"
     },
+    "remote_api_url": {
+        "description": "ASMR.ONE API网址",
+        "type": "string",
+        "default": "https://api.asmr-200.com"
+    },
     "remote_key": {
         "description": "ASMR.ONE cookie",
         "type": "string",
