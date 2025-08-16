@@ -3,7 +3,7 @@ from typing import Dict, Any
 ITEM_NOT_FOUND = "不存在"
 
 
-def parse_result(response)-> Dict[str, Any]:
+def parse_result(response) -> Dict[str, Any]:
     title = response.get("title", ITEM_NOT_FOUND)  # 作品名称
     pid = "RJ" + str(response.get("id", 0))  # 作品ID
     price = response.get("price", 0)  # 售价

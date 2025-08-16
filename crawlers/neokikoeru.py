@@ -10,7 +10,7 @@ RATE_GRADE = {
 ITEM_NOT_FOUND = "不存在"
 
 
-def parse_result(response)-> Dict[str, Any]:
+def parse_result(response) -> Dict[str, Any]:
     pid = response.get("id", ITEM_NOT_FOUND)  # 作品ID
     name = response.get("name", ITEM_NOT_FOUND)  # 作品名称
     price = response.get("price", 0)  # 售价
