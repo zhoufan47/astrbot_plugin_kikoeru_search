@@ -11,8 +11,8 @@ def parse_result(response) -> Dict[str, Any]:
     nsfw = response.get("nsfw", False)  # 年龄分级
     main_cover_url = response.get("mainCoverUrl")
     age_limit = "R-18" if nsfw else "全年龄"
-    rating = response.get("rating", 0)  # 评分
-    rating_count = response.get("rating_count", 0)  # 评价人数
+    rating = response.get("rate_average_2dp", 0)  # 评分
+    rating_count = response.get("rate_count", 0)  # 评价人数
     release_date = response.get("release", "未知")
     # 制作团队
     makers = response.get("name") or response.get("circle", {}).get("name", "未知")
@@ -34,8 +34,8 @@ def parse_result(response) -> Dict[str, Any]:
         "price": price,
         "sales": sales,
         "rate_grade": age_limit,
-        "rating": rating,
-        "rating_count": rating_count,
+        "rating": str(rating),
+        "rating_count": str(rating_count),
         "tags": genres,
         "illustrators": illustrators,
         "artists": artists,
