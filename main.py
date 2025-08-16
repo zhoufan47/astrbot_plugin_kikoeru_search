@@ -249,4 +249,4 @@ class MyPlugin(Star):
             await self.http_session_local.close()
         if self.http_session_proxy and not self.http_session_proxy.closed:
             await self.http_session_proxy.close()
-            logger.info("插件 [kikoeru_search] 已终止。")
+        logger.info("插件 [kikoeru_search] 已终止。")
