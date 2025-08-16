@@ -1,5 +1,3 @@
-from typing import Any, Coroutine
-
 import aiohttp
 from astrbot.core.message.components import Image
 
