@@ -30,8 +30,8 @@ class MyPlugin(Star):
         self.api_key = config.get('api_key')
         if not self.api_url or not self.api_key:
             logger.error("插件 [kikoeru_search] 的必要配置项 'api_url' 或 'api_key' 未填写，插件可能无法正常工作。")
-        #asmr.one 的 cookies
-        self.remote_key = config.get('remote_key',"")
+        #asmr.one 的 cookies,默认一个无效cookies,非NSFW数据查询可用
+        self.remote_key = config.get('remote_key',"1111111111")
         #本地库的外部网络访问地址
         self.external_url = config.get('external_url',self.api_url)
         #查询远程ASMR库是是否检查本地库是否存在该作品
@@ -54,47 +54,7 @@ class MyPlugin(Star):
             if pid == self.ITEM_NOT_FOUND:
                 yield event.plain_result(f"本地资源库不存在作品{query_str},可以下载！")
                 return
-
-            name = response.get("name","不存在")             #作品名称
-            price = response.get("price",0)          #售价
-            sales = response.get("sales", 0)                #销量
-            age_category = response.get("age_category",0) #年龄分级
-            logger.info(f"年龄分级数据:{age_category}")
-            grade_cn = self.RATE_GRADE.get(age_category,"未知")
-            rating = response.get("rating",0)       #评分
-            rating_count = response.get("rating_count", 0) #评价人数
-            release_date = response.get("release_date", "未知")
-            makers = response.get("maker",{}).get("name","未知")
-
-            # 表演者
-            artists_source = response.get("artists", [])
-            artists = ",".join([artist.get("name", "") for artist in artists_source])
-
-            #插画师
-            illustrators_source = response.get("illustrators",[])
-            illustrators = ",".join([illustrator.get("name", "") for illustrator in illustrators_source])
-            #tags
-            genres_source = response.get("genres",[])
-            genres = ",".join([genre.get("name", "") for genre in genres_source])
-
-            reply_message = (
-                f"✅ 查询成功！\n"
-                f"--------------------\n"
-                f"🎬 标题: {name}\n"
-                f"🔢 番号: {pid}\n"
-                f"📅 发行日:{release_date}\n"
-                f"🏢 制作组:{makers}\n"
-                f"🎤 演员:{artists}\n"
-                f"🎨 插画师:{illustrators}\n"
-                f"🏷️ 标签:{genres}\n"
-                f"💸 售价:{price}\n"
-                f"🏬 销量:{sales}\n"
-                f"🌟 评分:{rating}\n"
-                f"😃 评分人数:{rating_count}\n"
-                f"⛔ 年龄分级:{grade_cn}\n"
-                f"--------------------\n"
-                f"{self.external_url}/work/{pid}"
-            )
+            reply_message = await self.create_local_check_message(response)
             yield event.plain_result(reply_message)
         except aiohttp.ClientResponseError as e:
             logger.error(f"插件 [kikoeru_search] 请求API时服务器返回错误: {e.status} {e.message}")
@@ -102,6 +62,47 @@ class MyPlugin(Star):
         except Exception as e:
             logger.error(f"插件 [kikoeru_search] 处理命令 时发生未知错误: {e}", exc_info=True)
             yield event.plain_result("插件处理时发生未知错误，请联系管理员查看后台日志。")
+
+    async def create_local_check_message(self, response):
+        pid = response.get("id", "不存在")  # 作品ID
+        name = response.get("name", "不存在")  # 作品名称
+        price = response.get("price", 0)  # 售价
+        sales = response.get("sales", 0)  # 销量
+        age_category = response.get("age_category", 0)  # 年龄分级
+        logger.info(f"年龄分级数据:{age_category}")
+        grade_cn = self.RATE_GRADE.get(age_category, "未知")
+        rating = response.get("rating", 0)  # 评分
+        rating_count = response.get("rating_count", 0)  # 评价人数
+        release_date = response.get("release_date", "未知")
+        makers = response.get("maker", {}).get("name", "未知")
+        # 表演者
+        artists_source = response.get("artists", [])
+        artists = ",".join([artist.get("name", "") for artist in artists_source])
+        # 插画师
+        illustrators_source = response.get("illustrators", [])
+        illustrators = ",".join([illustrator.get("name", "") for illustrator in illustrators_source])
+        # tags
+        genres_source = response.get("genres", [])
+        genres = ",".join([genre.get("name", "") for genre in genres_source])
+        reply_message = (
+            f"✅ 查询成功！\n"
+            f"--------------------\n"
+            f"🎬 标题: {name}\n"
+            f"🔢 番号: {pid}\n"
+            f"📅 发行日:{release_date}\n"
+            f"🏢 制作组:{makers}\n"
+            f"🎤 演员:{artists}\n"
+            f"🎨 插画师:{illustrators}\n"
+            f"🏷️ 标签:{genres}\n"
+            f"💸 售价:{price}\n"
+            f"🏬 销量:{sales}\n"
+            f"🌟 评分:{rating}\n"
+            f"😃 评分人数:{rating_count}\n"
+            f"⛔ 年龄分级:{grade_cn}\n"
+            f"--------------------\n"
+            f"{self.external_url}/work/{pid}"
+        )
+        return reply_message
 
     @filter.command("远程奥术")
     async def remote_lib_search(self, event: AstrMessageEvent,query_str: str):
