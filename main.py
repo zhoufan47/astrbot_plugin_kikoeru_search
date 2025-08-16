@@ -200,7 +200,7 @@ class MyPlugin(Star):
             logger.info(f"检测场景，条件 {params}")
         else:
             url = f"{base_url}/api/v1/work/{params}"
-            logger.info(f"未知场景，条件 {params}")
+            logger.info(f"未知场景，默认为检查场景，条件 {params}")
 
         async with self.http_session_local.get(url, params=request_params,headers=headers) as response:
             logger.info(f"HTTP STATUS: {response.status}")
@@ -224,11 +224,14 @@ class MyPlugin(Star):
         if trade_type == 'search':
             # 搜索场景
             url = f"{base_url}/api/works"
+            logger.info(f"搜索场景，条件 {params}")
         elif trade_type == 'check':
             #检查场景
             url = f"{base_url}/api/workInfo/{params}"
+            logger.info(f"检测场景，条件 {params}")
         else:
             url = f"{base_url}/api/workInfo/{params}"
+            logger.info(f"未知场景，默认为检查场景，条件 {params}")
         async with self.http_session_proxy.get(url, params=request_params,headers=headers) as response:
             logger.info(f"远端资源库返回HTTP STATUS: {response.status}")
             if response.status == 404:
