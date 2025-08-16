@@ -22,9 +22,9 @@ class MyPlugin(Star):
     def __init__(self, context: Context,config: dict):
         super().__init__(context)
         #用来访问本地库的http_session
-        self.http_session_local = aiohttp.ClientSession(trust_env=False)
+        self.http_session_local = None
         #用来访问ASMR.ONE的http_session,使用astrbot提供的代理信息
-        self.http_session_proxy = aiohttp.ClientSession(trust_env=True)
+        self.http_session_proxy = None
         self.config = config
         #本地库地址
         self.api_url = config.get('api_url')
@@ -39,6 +39,8 @@ class MyPlugin(Star):
         logger.info("插件 [kikoeru_search] 已初始化。")
 
     async def initialize(self):
+        self.http_session_local = aiohttp.ClientSession(trust_env=False)
+        self.http_session_proxy = aiohttp.ClientSession(trust_env=True)
         """可选择实现异步的插件初始化方法，当实例化该插件类之后会自动调用该方法。"""
 
     # 注册指令的装饰器。指令名为 helloworld。注册成功后，发送 `/helloworld` 就会触发这个指令，并回复 `你好, {user_name}!`
@@ -166,7 +168,7 @@ class MyPlugin(Star):
             yield event.chain_result(chain)
             if self.check_local_flag:
                 rsp = await self.query_local_repository("check", query_str)
-                rst = rsp.get("id")
+                rst = rsp.get("id",self.ITEM_NOT_FOUND)
                 if rst == self.ITEM_NOT_FOUND:
                     yield event.plain_result(f"本地资源库不存在作品{query_str},可以下载！")
                 else:
@@ -184,6 +186,7 @@ class MyPlugin(Star):
             "Accept": "application/json, text/plain, */*",
             "authorization":f"Bearer {self.api_key}",
         }
+        request_params = params if trade_type == 'search' else None
         if trade_type == 'search':
             # 搜索场景
             url = self.api_url + "/api/v1/works"
@@ -196,7 +199,7 @@ class MyPlugin(Star):
             url = self.api_url + "/api/v1/works" + params
             logger.info(f"未知场景，条件 {params}")
 
-        async with self.http_session_local.get(url, params=params,headers=headers) as response:
+        async with self.http_session_local.get(url, params=request_params,headers=headers) as response:
             logger.info(f"HTTP STATUS: {response.status}")
             if response.status == 404:
                 return {"id":self.ITEM_NOT_FOUND}
@@ -214,6 +217,7 @@ class MyPlugin(Star):
             "user-agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 Edg/139.0.0.0"
         }
         base_url = "https://api.asmr-200.com"
+        request_params = params if trade_type == 'search' else None
         if trade_type == 'search':
             # 搜索场景
             url = base_url + "/api/works"
@@ -222,7 +226,7 @@ class MyPlugin(Star):
             url = base_url + "/api/workInfo/" + params
         else:
             url = base_url + "/api/workInfo/" + params
-        async with self.http_session_proxy.get(url, params=params,headers=headers) as response:
+        async with self.http_session_proxy.get(url, params=request_params,headers=headers) as response:
             logger.info(f"远端资源库返回HTTP STATUS: {response.status}")
             if response.status == 404:
                 return {"title":self.ITEM_NOT_FOUND}
