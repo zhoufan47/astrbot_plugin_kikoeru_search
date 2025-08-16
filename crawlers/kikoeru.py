@@ -15,9 +15,8 @@ def parse_result(response) -> Dict[str, Any]:
     rating_count = response.get("rating_count", 0)  # 评价人数
     release_date = response.get("release", "未知")
     # 制作团队
-    makers = response.get("name", None)
-    if makers is None:
-        makers = response.get("circle", {}).get("name", "未知")
+    makers = response.get("name") or response.get("circle", {}).get("name", "未知")
+
     # 表演者
     artists_source = response.get("vas", [])
     artists = ",".join([artist.get("name", "") for artist in artists_source])
