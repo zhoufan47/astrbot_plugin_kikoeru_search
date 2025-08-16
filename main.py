@@ -7,6 +7,29 @@ from astrbot.api import logger
 from .crawlers import kikoeru, neokikoeru
 
 
+# 创建消息
+def create_check_message(data:dict, base_url:str) -> str:
+    reply_message = (
+        f"✅ 查询成功！\n"
+        f"--------------------\n"
+        f"🎬 标题:{data.get("title")}\n"
+        f"🔢 番号:{data.get("pid")}\n"
+        f"📅 发行日:{data.get("release_date")}\n"
+        f"🏢 制作组:{data.get("makers")}\n"
+        f"🎤 演员:{data.get("artist")}\n"
+        f"🎨 插画师:{data.get("illustrators")}\n"
+        f"🏷️ 标签:{data.get("tags")}\n"
+        f"💸 售价:{data.get("price")}\n"
+        f"🏬 销量:{data.get("sales")}\n"
+        f"🌟 评分:{data.get("rating")}/5\n"
+        f"😃 评分人数:{data.get("rating_count")}\n"
+        f"⛔ 年龄分级:{data.get("rate_grade")}\n"
+        f"--------------------\n"
+        f"{base_url}/work/{data.get('pid')}"
+    )
+    return reply_message
+
+
 @register("kikoeru_search", "棒棒糖", "查询ASMR库数据", "1.1.0")
 class MyPlugin(Star):
 
@@ -34,6 +57,7 @@ class MyPlugin(Star):
         #查询远程ASMR库是是否检查本地库是否存在该作品
         self.check_local_flag = config.get('check_local_flag',False)
         self.remote_api_url = config.get('remote_api_url', 'https://api.asmr-200.com')
+        self.remote_base_url = config.get('remote_base_url', 'https://asmr.one')
         logger.info("插件 [kikoeru_search] 已初始化。")
 
     async def initialize(self):
@@ -51,7 +75,7 @@ class MyPlugin(Star):
             if data.get("title",self.ITEM_NOT_FOUND) == self.ITEM_NOT_FOUND:
                 yield event.plain_result(f"本地资源库不存在作品{query_str},可以下载！")
                 return
-            reply_message = self.create_local_check_message(data)
+            reply_message = create_check_message(data,self.external_url)
             yield event.plain_result(reply_message)
         except aiohttp.ClientResponseError as e:
             logger.error(f"插件 [kikoeru_search] 请求API时服务器返回错误: {e.status} {e.message}")
@@ -60,49 +84,7 @@ class MyPlugin(Star):
             logger.error(f"插件 [kikoeru_search] 处理命令 时发生未知错误: {e}", exc_info=True)
             yield event.plain_result("插件处理时发生未知错误，请联系管理员查看后台日志。")
 
-    #创建本地库消息
-    def create_local_check_message(self, data:dict):
-        reply_message = (
-            f"✅ 查询成功！\n"
-            f"--------------------\n"
-            f"🎬 标题:{data.get("title")}\n"
-            f"🔢 番号:{data.get("pid")}\n"
-            f"📅 发行日:{data.get("release_date")}\n"
-            f"🏢 制作组:{data.get("makers")}\n"
-            f"🎤 演员:{data.get("artist")}\n"
-            f"🎨 插画师:{data.get("illustrators")}\n"
-            f"🏷️ 标签:{data.get("tags")}\n"
-            f"💸 售价:{data.get("price")}\n"
-            f"🏬 销量:{data.get("sales")}\n"
-            f"🌟 评分:{data.get("rating")}/5\n"
-            f"😃 评分人数:{data.get("rating_count")}\n"
-            f"⛔ 年龄分级:{data.get("rate_grade")}\n"
-            f"--------------------\n"
-            f"{self.external_url}/work/{data.get("pid")}"
-        )
-        return reply_message
 
-    #创建远端库消息
-    def create_remote_check_message(self, data:dict):
-        reply_message = (
-            f"✅ 查询成功！\n"
-            f"--------------------\n"
-            f"🎬 标题:{data.get("title")}\n"
-            f"🔢 番号:{data.get("pid")}\n"
-            f"📅 发行日:{data.get("release_date")}\n"
-            f"🏢 制作组:{data.get("makers")}\n"
-            f"🎤 演员:{data.get("artist")}\n"
-            f"🎨 插画师:{data.get("illustrators")}\n"
-            f"🏷️ 标签:{data.get("tags")}\n"
-            f"💸 售价:{data.get("price")}\n"
-            f"🏬 销量:{data.get("sales")}\n"
-            f"🌟 评分:{data.get("rating")}/5\n"
-            f"😃 评分人数:{data.get("rating_count")}\n"
-            f"⛔ 年龄分级:{data.get("rate_grade")}\n"
-            f"--------------------\n"
-            f"https://asmr.one/work/{data.get("pid")}"
-        )
-        return reply_message
 
     @filter.command("远程奥术")
     async def remote_lib_search(self, event: AstrMessageEvent,query_str: str):
@@ -118,7 +100,7 @@ class MyPlugin(Star):
                 return
 
             #组装消息
-            reply_message = self.create_remote_check_message(data)
+            reply_message = create_check_message(data,self.remote_base_url)
             yield event.plain_result(reply_message)
 
             #处理封面
