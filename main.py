@@ -28,7 +28,7 @@ class MyPlugin(Star):
         if not self.api_url or not self.api_key:
             logger.error("插件 [kikoeru_search] 的必要配置项 'api_url' 或 'api_key' 未填写，插件可能无法正常工作。")
         #asmr.one 的 cookies,默认一个无效cookies,非NSFW数据查询可用
-        self.remote_key = config.get('remote_key',"1111111111")
+        self.remote_key = config.get('remote_key',"1")
         #本地库的外部网络访问地址
         self.external_url = config.get('external_url',self.api_url)
         #查询远程ASMR库是是否检查本地库是否存在该作品
