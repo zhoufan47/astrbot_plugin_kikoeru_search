@@ -4,7 +4,7 @@
 
 <br>
 <div align="center">
-  <a href="#-更新日志"><img src="https://img.shields.io/badge/VERSION-v1.0.0-E91E63?style=for-the-badge" alt="Version"></a>
+  <a href="#-更新日志"><img src="https://img.shields.io/badge/VERSION-v1.1.0-E91E63?style=for-the-badge" alt="Version"></a>
   <a href="https://www.python.org/"><img src="https://img.shields.io/badge/PYTHON-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python"></a>
   <a href="https://github.com/AstrBotDevs/AstrBot"><img src="https://img.shields.io/badge/AstrBot-Compatible-00BFA5?style=for-the-badge&logo=robot&logoColor=white" alt="AstrBot Compatible"></a>
 </div>
@@ -15,7 +15,7 @@
 
 ## 📝 介绍
 
-JAV_INFO 是一个基于 AstrBot 开发的 JAVDB数据查询插件，通过javdb.com网站获取相关数据发送至聊天平台
+kikoeru_search数据查询插件 是一个基于 AstrBot 开发的 kikoeru数据查询插件，通过ASMR.com网站获取相关数据发送至聊天平台
 
 ## ✨ 功能特性
 
@@ -23,6 +23,7 @@ JAV_INFO 是一个基于 AstrBot 开发的 JAVDB数据查询插件，通过javdb
 
 - 查询ASMR番号相关数据
 - 查询本地资源库是否存在作品
+- 本地库同时支援KIKOERU和NEOKIKOERU
 
 ## 🚀 安装方法
 
@@ -58,7 +59,11 @@ JAV_INFO 是一个基于 AstrBot 开发的 JAVDB数据查询插件，通过javdb
 
 
 ## 📝 更新日志
-#### **v1.0.0** (2025-08-16)
+#### **v1.1.0** (2025-08-16)
+
+- 增加本地资源库KIKOERU的支持
+
+#### **v1.0.0** (2025-08-15)
 
 - 初始版本发布
 

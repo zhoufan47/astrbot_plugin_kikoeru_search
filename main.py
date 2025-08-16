@@ -7,7 +7,7 @@ from astrbot.api import logger
 from .crawlers import kikoeru, neokikoeru
 
 
-@register("kikoeru_search", "棒棒糖", "查询ASMR库数据", "1.0.0")
+@register("kikoeru_search", "棒棒糖", "查询ASMR库数据", "1.1.0")
 class MyPlugin(Star):
 
     ITEM_NOT_FOUND = "不存在"
