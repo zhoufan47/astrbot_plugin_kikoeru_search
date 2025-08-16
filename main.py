@@ -183,7 +183,6 @@ class MyPlugin(Star):
         except Exception as e:
             logger.error(f"插件 [kikoeru_search] 处理命令 时发生未知错误: {e}", exc_info=True)
             yield event.plain_result("插件处理时发生未知错误，请联系管理员查看后台日志。")
-        return
 
     async def query_local_repository(self,trade_type:str,params:str) -> dict:
         headers = {
