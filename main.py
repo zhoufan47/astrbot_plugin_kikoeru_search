@@ -57,7 +57,7 @@ class MyPlugin(Star):
             sales = response.get("sales", 0)                #销量
             age_category = response.get("age_category",0) #年龄分级
             logger.info(f"年龄分级数据:{age_category}")
-            grade_cn = self.RATE_GRADE.get(age_category)
+            grade_cn = self.RATE_GRADE.get(age_category,"未知")
             rating = response.get("rating",0)       #评分
             rating_count = response.get("rating_count", 0) #评价人数
             release_date = response.get("release_date", "未知")
@@ -115,8 +115,7 @@ class MyPlugin(Star):
             sales = response.get("dl_count", 0)  # 销量
             nsfw = response.get("nsfw", False)  # 年龄分级
             main_cover_url = response.get("mainCoverUrl")
-            if nsfw:age_limit="是"
-            else:age_limit="否"
+            age_limit = "是" if nsfw else "否"
             rating = response.get("rating", 0)  # 评分
             rating_count = response.get("rating_count", 0)  # 评价人数
             release_date = response.get("release", "未知")
@@ -168,7 +167,7 @@ class MyPlugin(Star):
             if self.check_local_flag:
                 rsp = await self.query_local_repository("check", query_str)
                 rst = rsp.get("id")
-                if rst =='donotexits':
+                if rst == self.ITEM_NOT_FOUND:
                     yield event.plain_result(f"本地资源库不存在作品{query_str},可以下载！")
                 else:
                     yield event.plain_result(f"本地资源库已存在作品{query_str}")
@@ -198,10 +197,10 @@ class MyPlugin(Star):
             logger.info(f"未知场景，条件 {params}")
 
         async with self.http_session_local.get(url, params=params,headers=headers) as response:
-            response.raise_for_status()
             logger.info(f"HTTP STATUS: {response.status}")
             if response.status == 404:
                 return {"id":self.ITEM_NOT_FOUND}
+            response.raise_for_status()
             return await response.json()
 
     async def query_remote_repository(self,trade_type:str,params:str) -> dict:
@@ -224,10 +223,10 @@ class MyPlugin(Star):
         else:
             url = base_url + "/api/workInfo/" + params
         async with self.http_session_proxy.get(url, params=params,headers=headers) as response:
-            response.raise_for_status()
             logger.info(f"远端资源库返回HTTP STATUS: {response.status}")
             if response.status == 404:
                 return {"title":self.ITEM_NOT_FOUND}
+            response.raise_for_status()
             return await response.json()
 
     async def terminate(self):
